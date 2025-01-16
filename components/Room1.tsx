@@ -3,10 +3,14 @@ import { Canvas } from "@react-three/fiber";
 import React from "react";
 import { View } from "react-native";
 
+interface RoomProps {
 
-export default function Room1 () {
+}
+
+const Room: RoomProps = ({}) => {
+
     return (
-        <View style={{ flex: 1 }}>
+    <View style={{ flex: 1 }}>
       {/* 3D Scene */}
       <Canvas style={{ flex: 1 }} camera={{ position: [0, 1, 4], fov: 50 }}>
         {/* Add an environment map for realistic lighting */}
@@ -46,5 +50,12 @@ export default function Room1 () {
         <pointLight position={[10, 10, 10]} />
       </Canvas>
     </View>
-    )
+
+    );
+
+
 }
+
+export default Room;
+
+
