@@ -8,15 +8,28 @@ import { useLoader } from "@react-three/fiber";
 import { TextureLoader } from "three"; 
 
 import { Asset } from 'expo-asset';
+//import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+
+import { useGLTF } from '@react-three/drei/native'
+import { GLTFLoader } from "@/node_modules copy/three-stdlib";
+
 
 interface RoomProps {}
 
 const Room: React.FC<RoomProps> = () => {
   // Load the image using Expo's Asset module
-  const reactLogo = Asset.fromModule(require('@/assets/images/partial-react-logo.png')).uri;
+  const reactLogo = Asset.fromModule(require('../assets/images/partial-react-logo.png')).uri;
+
 
   // Load the texture using the URI
   const texture = useLoader(TextureLoader, reactLogo);
+
+  const skel = Asset.fromModule(require('../assets/model.glb')).uri;
+
+  const model = useLoader(GLTFLoader, skel);
+
+    //const model = useGLTF('../assets/model.glb');
+  
 
   return (
     <View style={{ flex: 1 }}>
@@ -34,6 +47,8 @@ const Room: React.FC<RoomProps> = () => {
         <Plane args={[5, 5]} position={[0, -2.5, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <meshStandardMaterial color="lightgray" />
         </Plane>
+
+        {/*<primitive object={model.scene} scale={0.5} position={[0, 0, 0]} /> */}
 
         {/* Create walls */}
         <Box position={[-2.5, -0.75, 0]} args={[0.2, 3.5, 5]}>
@@ -60,6 +75,8 @@ const Room: React.FC<RoomProps> = () => {
         <Box position={[0, 0, 0]} args={[2, 2, 2]}>
           <meshStandardMaterial map={texture} />
         </Box>
+
+        <primitive position={[1.5, -2.5, -1]} object={model.scene} scale={[0.1, 0.1, 0.1]} rotation={[0, Math.PI / 1, 0]}/>
 
         {/* Camera controls for navigating the scene */}
         <OrbitControls enablePan={false} minDistance={1} maxDistance={5} />
