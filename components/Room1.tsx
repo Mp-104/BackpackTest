@@ -1,6 +1,6 @@
-import { Box, Environment, OrbitControls, Plane } from "@react-three/drei";
+import { Box, Environment, OrbitControls, Plane, Sphere, Texture } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { Image, StyleSheet, Platform } from 'react-native';
 
@@ -16,19 +16,99 @@ import { GLTFLoader } from "@/node_modules copy/three-stdlib";
 
 interface RoomProps {}
 
+const Table: React.FC<{ position: [number, number, number], scale: [number, number, number], rotation: [number, number, number] }> = ({ position, scale, rotation }) => {
+
+  return (
+    <group position={position} scale={scale} rotation={rotation} >
+    
+      <Box position={[-0.5, -2, 2]} args={[0.1, 1.3, 0.1]}>
+          <meshStandardMaterial color="tan" />
+      </Box>
+
+      <Box position={[-2, -2, 2]} args={[0.1, 1.3, 0.1]}>
+          <meshStandardMaterial color="tan" />
+      </Box>
+
+      <Box position={[-0.5, -2, 1]} args={[0.1, 1.3, 0.1]}>
+        <meshStandardMaterial color="tan" />
+      </Box>
+
+      <Box position={[-2, -2, 1]} args={[0.1, 1.3, 0.1]}>
+        <meshStandardMaterial color="tan" />
+      </Box>
+
+      <Box position={[-1.26, -1.4, 1.45]} args={[1.8, 0.1, 1.2]}>
+        <meshStandardMaterial color={"tan"}/>
+      </Box>
+
+   </group>
+  )
+
+}
+
 const Room: React.FC<RoomProps> = () => {
   // Load the image using Expo's Asset module
   const reactLogo = Asset.fromModule(require('../assets/images/partial-react-logo.png')).uri;
 
+  const football = Asset.fromModule(require('../assets/football.jpg')).uri;
+
+  //const drink = Asset.fromModule(require('../assets/drink.gif')).uri;
+  const drink1 = Asset.fromModule(require('../assets/drink/drink1.png')).uri;
+  const drink2 = Asset.fromModule(require('../assets/drink/drink2.png')).uri;
+  const drink3 = Asset.fromModule(require('../assets/drink/drink3.png')).uri;
+  const drink4 = Asset.fromModule(require('../assets/drink/drink4.png')).uri;
 
   // Load the texture using the URI
   const texture = useLoader(TextureLoader, reactLogo);
 
+  const footballTexture = useLoader(TextureLoader, football);
+
+  //const drinkGif = useLoader(TextureLoader, drink);
+  //drinkGif.needsUpdate = true;
+
+  const drinkImage1 = useLoader(TextureLoader, drink1);
+  const drinkImage2 = useLoader(TextureLoader, drink2);
+  const drinkImage3 = useLoader(TextureLoader, drink3);
+  const drinkImage4 = useLoader(TextureLoader, drink4);
+
+
+  // Load models using the URI
   const skel = Asset.fromModule(require('../assets/model.glb')).uri;
+
+  const pistol = Asset.fromModule(require('../assets/Pistol.glb')).uri;
+
+  const toilet = Asset.fromModule(require('../assets/toilet.gltf')).uri;
+  
 
   const model = useLoader(GLTFLoader, skel);
 
+  const model2 = useLoader(GLTFLoader, pistol);
+
+  const model3 = useLoader(GLTFLoader, toilet);
+
     //const model = useGLTF('../assets/model.glb');
+
+
+
+
+    // state for alternating between texture
+    const [currentTexture, setCurrentTexture] = useState(drinkImage1);
+
+    // Alternate between 1 sec
+    useEffect(() => {
+      const interval = setInterval(() => {
+        //setCurrentTexture(prev => ( prev === drinkImage1 ? drinkImage2 : drinkImage1));
+        setCurrentTexture(prev => {
+          if(prev === drinkImage1) return drinkImage2;
+          if(prev === drinkImage2) return drinkImage3;
+          if(prev === drinkImage3) return drinkImage4;
+          return drinkImage1;
+        })
+      }, 100);
+
+      // clear interval when component is unmounted
+      return () => clearInterval(interval);
+    }, [drinkImage1, drinkImage2, drinkImage3, drinkImage4 ]);
   
 
   return (
@@ -62,21 +142,41 @@ const Room: React.FC<RoomProps> = () => {
         </Box>
 
         {/* Blue box */}
-        <Box position={[-1.2, -2, 0]}>
+        <Box position={[-1.2, -2, -1]}>
           <meshStandardMaterial color="royalblue" />
         </Box>
 
-        {/* Orange box */}
-        <Box position={[2, 0, 0]}>
-          <meshStandardMaterial color="green" map={texture}/>
+        
+        <Table position={[-0.2, 0, 0.4]} scale={[1, 1, 1]} rotation={[0, 0, 0]}/>
+
+        {/* Drink box */}
+        <Box position={[2.85, -1, 0]}>
+          <meshStandardMaterial  map={currentTexture}/>
+        </Box>
+
+        <Box position={[3.051, -1, 0]} scale={[1.4, 1.4, 1.4]}>
+          <meshStandardMaterial color={"black"} />
         </Box>
 
         {/* Box with the react logo texture */}
-        <Box position={[0, 0, 0]} args={[2, 2, 2]}>
+        <Box position={[-6, 0, 0]} args={[2, 2, 2]}>
           <meshStandardMaterial map={texture} />
         </Box>
 
-        <primitive position={[1.5, -2.5, -1]} object={model.scene} scale={[0.1, 0.1, 0.1]} rotation={[0, Math.PI / 1, 0]}/>
+        {/* (foot)Ball */}
+        <Sphere position={[1, -2.23, 2]} scale={[0.3, 0.3, 0.3]}>
+          <meshStandardMaterial map={footballTexture} />
+        </Sphere>
+
+
+        {/* Skeleton*/}
+        <primitive position={[2.2, -2.5, 1.7]} object={model.scene} scale={[0.1, 0.1, 0.1]} rotation={[0, Math.PI / -2, 0]}/>
+
+        {/* Pistol*/}
+        <primitive position={[-1.4, -1.325, 1.5]} object={model2.scene} scale={[1, 1, 1]} rotation={[1.5, 0, 0]}/>
+
+        {/* toilet*/}
+        <primitive position={[-2.4, -2.5, 0.5]} object={model3.scene} scale={[2, 2, 2]} rotation={[0, 1.57, 0]}/>
 
         {/* Camera controls for navigating the scene */}
         <OrbitControls enablePan={false} minDistance={1} maxDistance={5} />
