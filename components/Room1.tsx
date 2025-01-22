@@ -94,7 +94,7 @@ const Room: React.FC<RoomProps> = () => {
     // state for alternating between texture
     const [currentTexture, setCurrentTexture] = useState(drinkImage1);
 
-    // Alternate between 1 sec
+    // useEffect for alternating between the given images and setting them into the currentTexture useState. Alternate between 1 sec
     useEffect(() => {
       const interval = setInterval(() => {
         //setCurrentTexture(prev => ( prev === drinkImage1 ? drinkImage2 : drinkImage1));
@@ -154,6 +154,7 @@ const Room: React.FC<RoomProps> = () => {
           <meshStandardMaterial  map={currentTexture}/>
         </Box>
 
+        {/*Black box as "tv"*/}
         <Box position={[3.051, -1, 0]} scale={[1.4, 1.4, 1.4]}>
           <meshStandardMaterial color={"black"} />
         </Box>
