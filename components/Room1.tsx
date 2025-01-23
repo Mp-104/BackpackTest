@@ -1,6 +1,6 @@
 import { Box, Environment, OrbitControls, Plane, Sphere, Texture } from "@react-three/drei";
-import { Canvas } from "@react-three/fiber";
-import React, { useEffect, useState } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
+import React, { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { Image, StyleSheet, Platform } from 'react-native';
 
@@ -12,14 +12,71 @@ import { Asset } from 'expo-asset';
 
 import { useGLTF } from '@react-three/drei/native'
 import { GLTFLoader } from "@/node_modules copy/three-stdlib";
+import { PerspectiveCamera } from "@/node_modules copy/@react-three/drei";
 
 
 interface RoomProps {}
 
+const Ball = () => {
+
+  const boxRef = useRef();
+
+    
+
+    useFrame(() => {
+      const time = performance.now() * 0.0055
+      if (boxRef.current) {
+        // Circular motion
+        /* boxRef.current.position.x = Math.sin(time) * 1
+        boxRef.current.position.z = Math.cos(time) * 1 */
+        boxRef.current.position.y = Math.cos(time)-0.97 * 1.3
+      }
+    })
+
+  const football = Asset.fromModule(require('../assets/balldimpled.png')).uri;
+
+  const footballTexture = useLoader(TextureLoader, football);
+  return (
+    <>
+      {/* (foot)Ball */}
+      <Sphere ref={boxRef} position={[-0.1, -2.23, 2]} scale={[0.3, 0.3, 0.3]}>
+          <meshStandardMaterial map={footballTexture} />
+        </Sphere>
+    </>
+  )
+
+}
+
 const Table: React.FC<{ position: [number, number, number], scale: [number, number, number], rotation: [number, number, number] }> = ({ position, scale, rotation }) => {
 
+
+    /* const boxRef = useRef();
+
+    const [speed, setSpeed] = useState(0.05);
+
+    useFrame(() => {
+      if (boxRef.current) {
+        boxRef.current.position.x += speed}
+
+        if(boxRef.current.position.x > 5 || boxRef.current.position.x < 5) {
+          setSpeed(-speed)
+        }
+    })
+
+    useFrame(() => {
+      const time = performance.now() * 0.001
+      if (boxRef.current) {
+        // Circular motion
+        boxRef.current.position.x = Math.sin(time) * 1
+        boxRef.current.position.z = Math.cos(time) * 1
+      }
+    }) */
+
+      // Above code is to make object Table move, back and forth first useFrame and circular second useFrame
+
+
   return (
-    <group position={position} scale={scale} rotation={rotation} >
+    <group /* ref={boxRef} */ position={position} scale={scale} rotation={rotation} >
     
       <Box position={[-0.5, -2, 2]} args={[0.1, 1.3, 0.1]}>
           <meshStandardMaterial color="tan" />
@@ -111,6 +168,8 @@ const Room: React.FC<RoomProps> = () => {
     }, [drinkImage1, drinkImage2, drinkImage3, drinkImage4 ]);
   
 
+    
+
   return (
     <View style={{ flex: 1 }}>
       <Image
@@ -169,6 +228,8 @@ const Room: React.FC<RoomProps> = () => {
           <meshStandardMaterial map={footballTexture} />
         </Sphere>
 
+        <Ball />
+
 
         {/* Skeleton*/}
         <primitive position={[2.2, -2.5, 1.7]} object={model.scene} scale={[0.1, 0.1, 0.1]} rotation={[0, Math.PI / -2, 0]}/>
@@ -181,6 +242,8 @@ const Room: React.FC<RoomProps> = () => {
 
         {/* Camera controls for navigating the scene */}
         <OrbitControls enablePan={false} minDistance={1} maxDistance={5} />
+
+        <PerspectiveCamera makeDefault position={[0, 1000000, -3000000]} />
 
         {/* Lighting */}
         <ambientLight intensity={0.5} />
