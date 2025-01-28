@@ -5,7 +5,7 @@ import { View } from "react-native";
 import { Image, StyleSheet, Platform } from 'react-native';
 
 import { useLoader } from "@react-three/fiber";
-import { TextureLoader } from "three"; 
+import { MeshStandardMaterial, TextureLoader } from "three"; 
 
 import { Asset } from 'expo-asset';
 //import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
@@ -21,7 +21,8 @@ const Ball = () => {
 
   const boxRef = useRef();
 
-    
+    // useFrame hook allows object boxRef, which is later passed on to the relevant model, a sphere, to continously move every frame between the desired positions (Math.cos(time))
+    // and the desired axis('s)
 
     useFrame(() => {
       const time = performance.now() * 0.0055
@@ -33,14 +34,41 @@ const Ball = () => {
       }
     })
 
-  const football = Asset.fromModule(require('../assets/balldimpled.png')).uri;
+    
+  const basketBall = Asset.fromModule(require('../assets/balldimpled.png')).uri;
 
-  const footballTexture = useLoader(TextureLoader, football);
+  const basketballTexture = useLoader(TextureLoader, basketBall);
+
+
+
+  const [clicked, setClicked] = useState<boolean>(false);
+
+  const modelRef = useRef<any>();
+
+  const handleClick = () => {
+    setClicked(!clicked);
+    alert('basketboll');
+  }
+
+  const modelMaterial = clicked
+    ? {  opacity: 0.5, transparent: true } // Highlight when clicked
+    : {  opacity: 1, transparent: false }; // Default state
+
+  /* useEffect(() => {
+    if (boxRef.current) {
+      boxRef.current.traverse((child: any) => {
+        if (child.isMesh) {
+          child.material = new MeshStandardMaterial(modelMaterial);
+        }
+      })
+    }
+  }, [clicked, modelMaterial]); */
+
   return (
     <>
-      {/* (foot)Ball */}
-      <Sphere ref={boxRef} position={[-0.1, -2.23, 2]} scale={[0.3, 0.3, 0.3]}>
-          <meshStandardMaterial map={footballTexture} />
+      {/* (basket)Ball */}
+      <Sphere ref={boxRef} position={[-0.1, -2.23, 2]} scale={[0.3, 0.3, 0.3]} onPointerDown={handleClick}>
+          <meshStandardMaterial map={basketballTexture} />
         </Sphere>
     </>
   )
@@ -166,8 +194,14 @@ const Room: React.FC<RoomProps> = () => {
       // clear interval when component is unmounted
       return () => clearInterval(interval);
     }, [drinkImage1, drinkImage2, drinkImage3, drinkImage4 ]);
-  
 
+
+  
+    
+
+    const handleClick = () => {
+      alert('Pistol clicked');
+    };
     
 
   return (
@@ -235,7 +269,7 @@ const Room: React.FC<RoomProps> = () => {
         <primitive position={[2.2, -2.5, 1.7]} object={model.scene} scale={[0.1, 0.1, 0.1]} rotation={[0, Math.PI / -2, 0]}/>
 
         {/* Pistol*/}
-        <primitive position={[-1.4, -1.325, 1.5]} object={model2.scene} scale={[1, 1, 1]} rotation={[1.5, 0, 0]}/>
+        <primitive position={[-1.4, -1.325, 1.5]} object={model2.scene} scale={[1, 1, 1]} rotation={[1.5, 0, 0]} onPointerDown={handleClick}/>
 
         {/* toilet*/}
         <primitive position={[-2.4, -2.5, 0.5]} object={model3.scene} scale={[2, 2, 2]} rotation={[0, 1.57, 0]}/>
