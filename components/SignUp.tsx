@@ -4,45 +4,34 @@ import { useState } from "react";
 import { Alert, StyleSheet, View, Text } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { Button, Snackbar } from "react-native-paper";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "./Firebase";
 
+// To successfully register, or sign up, you need a properly typed email and password containing at least 6 characters, that is part of Firebase initial setup
 
-const LoginPage = () => {
+
+const SignUp = () => {
     const [username, setUsername] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [visible, setVisible] = useState<boolean>(false);
     const [visible2, setVisible2] = useState<boolean>(false);
 
-    const handleLogin =  async () => {
-        if (username === '' || password === '') {
+    const handleSignUp = async () => {
+        try {
 
-            Alert.alert('Error', 'Var vänlig fyll i username och password');
-            /* console.log("det är tomt");
-            alert("tomt") */
-            setVisible2(true);
-
-        } else {
-            try{
-                await signInWithEmailAndPassword(auth, username, password);
-                Alert.alert('Inloggad', `Välkommen, ${username}!`);
-                console.log("inloggad: ", username);
-                 /*  alert("test")*/
-                setVisible(true); 
-
-            } catch (error: any) {
-                Alert.alert('Error', error.message);
-                console.log("login error", error.message);
-            }
-
-            
-
+          await createUserWithEmailAndPassword(auth, username, password);
+          Alert.alert('Registrering lyckades', `Välkommen, ${username}!`);
+          setVisible(true)
+          
+        } catch (error: any) {
+          Alert.alert('Error', error.message);
+          setVisible2(true)
         }
-    }
+      };
 
     return (
         <View style={styles.container}>
-            <Text style={styles.header}>Logga in</Text>
+            <Text style={styles.header}>Sign up</Text>
 
             <TextInput
                 style={styles.input}
@@ -60,15 +49,15 @@ const LoginPage = () => {
                 secureTextEntry
             />
 
-            <Button mode="contained" onPress={handleLogin} style={styles.loginButton}>
-                Logga in
+            <Button mode="contained" onPress={handleSignUp} style={styles.loginButton}>
+                Submit
             </Button>
 
             <Snackbar style={styles.snackbar}
                 visible={visible}
                 onDismiss={() => setVisible(false)}
                 duration={Snackbar.DURATION_SHORT}>
-                    Välkommen, {username}!
+                    Registrerad, {username}!
 
             </Snackbar>
 
@@ -88,7 +77,7 @@ const LoginPage = () => {
 
 }
 
-export default LoginPage;
+export default SignUp;
 
 const styles = StyleSheet.create({
     container: {

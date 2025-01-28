@@ -3,6 +3,7 @@ import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
 import { getAnalytics } from 'firebase/analytics';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
+
 const firebaseConfig = {
 
     apiKey: "AIzaSyCnWQS3GcWptAr6mjYEGoNoKOx9OugDyZw",
@@ -16,7 +17,15 @@ const firebaseConfig = {
 
 };
 
-const app = initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig)
+const auth = getAuth(app)
+
+export {auth}
+
+
+
+
+/* const app = initializeApp(firebaseConfig);
 
 //const db = getFirestore(app);
 const analytics = getAnalytics(app);
@@ -33,4 +42,5 @@ onAuthStateChanged( auth, user => {
 
 console.log("analytics: ")
 console.log(analytics)
-console.log("analytics end ")
+console.log("analytics end ") */
+
