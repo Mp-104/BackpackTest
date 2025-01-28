@@ -6,8 +6,11 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Test } from '@/components/Test';
 import Room1 from '@/components/Room1';
+import currentUser from '@/components/CurrentUser';
 
 export default function HomeScreen() {
+
+  const user = currentUser();
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
@@ -17,8 +20,8 @@ export default function HomeScreen() {
           style={styles.reactLogo}
         />
       }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
+      <ThemedView style={styles.titleContainer}>{/* user.email works, user.uid as well */}
+        <ThemedText type="title">Welcome! {user ? user.email : "Gäst"}</ThemedText>
         <HelloWave />
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
