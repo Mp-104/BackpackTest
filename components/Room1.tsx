@@ -54,6 +54,8 @@ const Ball = () => {
     ? {  opacity: 0.5, transparent: true } // Highlight when clicked
     : {  opacity: 1, transparent: false }; // Default state
 
+
+  // change opacity on click
   /* useEffect(() => {
     if (boxRef.current) {
       boxRef.current.traverse((child: any) => {
