@@ -5,6 +5,11 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { useEffect, useState } from 'react';
 import { auth } from "./Firebase";
 
+interface User {
+    uid: string,
+    email: string
+}
+
 const currentUser = () => {
 
     const [user, setUser] = useState<any>(null);

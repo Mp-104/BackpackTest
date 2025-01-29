@@ -5,7 +5,8 @@ import { Alert, StyleSheet, View, Text } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { Button, Snackbar } from "react-native-paper";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "./Firebase";
+import { auth, db } from "./Firebase";
+import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore/lite";
 
 
 const LoginPage = () => {
@@ -13,6 +14,37 @@ const LoginPage = () => {
     const [password, setPassword] = useState<string>('');
     const [visible, setVisible] = useState<boolean>(false);
     const [visible2, setVisible2] = useState<boolean>(false);
+
+    const getEmailbyUsername = async (username: string) => {
+
+        try {
+
+            const usersCollectionRef = collection(db, "users");
+            const queryingUsers = query(usersCollectionRef, where("username", "==", username));
+
+            const querySnapshot = await getDocs(queryingUsers);
+
+            if (!querySnapshot.empty) {
+
+                for (const doc of querySnapshot.docs ) {
+
+                    const userData = doc.data();
+                    const email = userData.email;
+                    console.log("email for user : ", username, email);
+
+                    return email;
+                };
+
+            } else {
+
+                console.log("no user found with username: ", username)
+                return null;
+            }
+
+        } catch (error) {
+            console.error("error fetching document: ", error);
+        }
+    };
 
     const handleLogin =  async () => {
         if (username === '' || password === '') {
@@ -23,12 +55,64 @@ const LoginPage = () => {
             setVisible2(true);
 
         } else {
+
             try{
-                await signInWithEmailAndPassword(auth, username, password);
+                let email = "";
+
+                if (username.includes("@")) {
+
+                    email = username;
+
+                } else {
+                    
+                    const userEmail = await getEmailbyUsername(username);
+
+                    email = userEmail;
+
+                    console.log("userEmail: ", userEmail);
+
+                    /* const userDoc1 = await getDoc(doc(db, "users", "fB3sbjb0ETagPsCZ8BRtNTuZdYw1"));
+                    const userDoc = await getDoc(doc(db, "users", username)); */
+
+                    
+
+                    const querySnapshot = await getDocs(collection(db, "users"));
+                    querySnapshot.forEach((doc) => {
+                        console.log(`${doc.id} => ${doc.data().email}`);
+                    });
+
+                   /*  console.log("email: ", email);
+                    console.log("username: ", username);
+                    console.log("userDoc1: ", userDoc1.data())
+
+                    
+                    if (userDoc.exists()) {
+                        email = userDoc.data().email;
+                    } else {
+                        console.log("ej kan logga in med ", email);
+                        throw new Error ("username not found");
+                    } */
+                }
+
+
+                console.log("email: ", email);
+
+                if (email) {
+
+                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+                    console.log("User logged in!: ", user.displayName || user.email)
+                    Alert.alert('Inloggad', `Välkommen, ${username}!`);
+                    console.log("inloggad: ", username);
+                    /*  alert("test")*/
+                    setVisible(true); 
+                }
+
+                /* await signInWithEmailAndPassword(auth, username, password);
                 Alert.alert('Inloggad', `Välkommen, ${username}!`);
                 console.log("inloggad: ", username);
                  /*  alert("test")*/
-                setVisible(true); 
+                // setVisible(true);  
 
             } catch (error: any) {
                 Alert.alert('Error', error.message);

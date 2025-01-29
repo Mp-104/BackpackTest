@@ -4,28 +4,54 @@ import { useState } from "react";
 import { Alert, StyleSheet, View, Text } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { Button, Snackbar } from "react-native-paper";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "./Firebase";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { auth, db } from "./Firebase";
+import { doc, setDoc } from "firebase/firestore/lite";
 
 // To successfully register, or sign up, you need a properly typed email and password containing at least 6 characters, that is part of Firebase initial setup
 
 
 const SignUp = () => {
+    const [email, setEmail] = useState<string>('');
     const [username, setUsername] = useState<string>('');
+    const [displayName, setDisplayname] = useState<string>('');
+    const [photoURL, setPhotoURL] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [visible, setVisible] = useState<boolean>(false);
     const [visible2, setVisible2] = useState<boolean>(false);
 
     const handleSignUp = async () => {
+
         try {
 
-          await createUserWithEmailAndPassword(auth, username, password);
-          Alert.alert('Registrering lyckades', `Välkommen, ${username}!`);
-          setVisible(true)
+            // this creates a new user with email and password using the auth configuration 
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+            //notifying that the registration was successful
+            Alert.alert('Registrering lyckades', `Välkommen, ${email}!`);
+            setVisible(true)
+
+            // creates a database entry for the newly registered user, makes an object containing user's email and username.
+            //  This is used as a reference to log in using the username instead/alongside email
+            await setDoc(doc(db, 'users', user.uid), {
+                email: user.email,
+                username: username,
+            });
+
+            // after the user is created its displayName is updated
+            await updateProfile(user, {
+                displayName: displayName,
+                photoURL: photoURL,
+            });
+
+            console.log("user registered successfully");
           
         } catch (error: any) {
+
           Alert.alert('Error', error.message);
           setVisible2(true)
+          console.log("Error registering user: ", error.message)
         }
       };
 
@@ -35,9 +61,33 @@ const SignUp = () => {
 
             <TextInput
                 style={styles.input}
+                placeholder="Email"
+                value={email}
+                onChangeText={setEmail}
+                
+            />
+
+            <TextInput
+                style={styles.input}
                 placeholder="Username"
                 value={username}
                 onChangeText={setUsername}
+                
+            />
+
+            <TextInput
+                style={styles.input}
+                placeholder="DisplayName"
+                value={displayName}
+                onChangeText={setDisplayname}
+                
+            />
+
+            <TextInput
+                style={styles.input}
+                placeholder="PhotoURL"
+                value={photoURL}
+                onChangeText={setPhotoURL}
                 
             />
 
@@ -57,7 +107,7 @@ const SignUp = () => {
                 visible={visible}
                 onDismiss={() => setVisible(false)}
                 duration={Snackbar.DURATION_SHORT}>
-                    Registrerad, {username}!
+                    Registrerad, {email}!
 
             </Snackbar>
 

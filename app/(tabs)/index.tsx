@@ -8,9 +8,13 @@ import { Test } from '@/components/Test';
 import Room1 from '@/components/Room1';
 import currentUser from '@/components/CurrentUser';
 
+
 export default function HomeScreen() {
 
+  //const handleSLogout =
+
   const user = currentUser();
+  
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
@@ -20,10 +24,24 @@ export default function HomeScreen() {
           style={styles.reactLogo}
         />
       }>
-      <ThemedView style={styles.titleContainer}>{/* user.email works, user.uid as well */}
-        <ThemedText type="title">Welcome! {user ? user.email : "Gäst"}</ThemedText>
+      <ThemedView style={styles.titleContainer}>{/* user.email works, user.uid as well. user.displayName works as well, but may be empty if not provided upon registration or included later*/}
+        <ThemedText type="title">Welcome! {user ? user.displayName : "Gäst"}</ThemedText>
         <HelloWave />
+
+          {user && user.photoURL ? (
+          <Image
+            source={{ uri: user.photoURL }} // Use the user's photoURL as the source
+            style={styles.profileImage} // Apply your desired style here
+          />
+        ) : (
+          <Image
+            source={require('@/assets/images/partial-react-logo.png')} // Fallback image if no photoURL
+            style={styles.profileImage} // Same styling for the fallback image
+          />
+        )}
+        
       </ThemedView>
+      
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Step 1: Try it</ThemedText>
         <ThemedText>
@@ -79,5 +97,12 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     position: 'absolute',
+  },
+  profileImage: {
+    width: 100,    // Set width of the profile image
+    height: 100,   // Set height of the profile image
+    borderRadius: 50, // Make it circular if desired
+    marginTop: 10, // Add some space between the name and photo
+    alignSelf: 'center', // Center the image
   },
 });
