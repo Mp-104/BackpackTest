@@ -7,16 +7,25 @@ import { ThemedView } from '@/components/ThemedView';
 import { Test } from '@/components/Test';
 import Room1 from '@/components/Room1';
 import currentUser from '@/components/CurrentUser';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { auth } from '@/components/Firebase';
 
 
 export default function HomeScreen() {
 
-  //const handleSLogout =
+
+
+  
+  
 
   const user = currentUser().user;
   const userData = currentUser().userData;
+  
+  useEffect(() => {
+    console.log("user data updated: ", userData);
+  }, [userData])
+
+  
   
   function handleLogout(event: GestureResponderEvent): void {
     alert("this should log you out")
@@ -33,7 +42,7 @@ export default function HomeScreen() {
         />
       }>
       <ThemedView style={styles.titleContainer}>{/* user.email works, user.uid as well. user.displayName works as well, but may be empty if not provided upon registration or included later*/}
-        <ThemedText type="title">Welcome! {user ? user.displayName : "Gäst"} {userData ? userData.role[0] : ""} {userData ? userData.username : ""}</ThemedText>
+        <ThemedText type="title">Welcome! {user ? user.displayName : "Gäst"} {userData ? userData.role : ""} {userData ? userData.username : ""}</ThemedText>
         <HelloWave />
 
           {user && user.photoURL ? (

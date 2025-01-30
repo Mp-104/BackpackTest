@@ -6,9 +6,10 @@ import { TextInput } from "react-native-gesture-handler";
 import { Button, Snackbar } from "react-native-paper";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "./Firebase";
-import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore/lite";
+import { collection, doc, getDoc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore/lite";
 import { routeToScreen } from "expo-router/build/useScreens";
 import { router } from "expo-router";
+import currentUser from "./CurrentUser";
 
 
 const LoginPage = () => {
@@ -65,16 +66,19 @@ const LoginPage = () => {
 
             try{
                 let email = "";
+                let role = "";
 
                 if (username.includes("@")) {
 
                     email = username;
+                    role = "adult";
 
                 } else {
                     
                     const userEmail = await getEmailbyUsername(username);
 
                     email = userEmail;
+                    role = "minor";
 
                     console.log("userEmail: ", userEmail);
 
@@ -111,6 +115,25 @@ const LoginPage = () => {
 
                     const userDocRef = doc(db, "users", user.uid);
                     const userDoc = await getDoc(userDocRef);
+
+                    await updateDoc(doc(db, 'users', user.uid), {
+                        role: role,
+                    });
+
+
+                    // TODO :  why is there a signOut call in a login function? Because it ensures the role is updated properly before it renders
+                    // otherwise it shows outdated info upon redirecting the page with router.replace("/(tabs)");
+                    auth.signOut();
+
+                    const userCredential1 = await signInWithEmailAndPassword(auth, email, password);
+                    
+
+                    const updatedUserDoc = await getDoc(userDocRef);
+                    if (updatedUserDoc.exists()) {
+                        console.log("Updated userDoc data:", updatedUserDoc.data());
+                    }
+                    
+                    
 
 
                     console.log("user.displayName: ", user.displayName);

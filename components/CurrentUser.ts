@@ -33,11 +33,12 @@ const currentUser = () => {
                 }
             } else {
                 setUser(null);
+                setUserData(null);
             }
         })
 
         return () => unsubscribe();
-    }, [])
+    }, [user])
 
     return {user, userData} ;
 

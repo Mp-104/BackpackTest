@@ -13,7 +13,7 @@ import currentUser from '@/components/CurrentUser';
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
-  const user = currentUser()
+  const user = currentUser().user
 
   return (
     <Tabs
