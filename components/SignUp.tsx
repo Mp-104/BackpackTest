@@ -37,6 +37,7 @@ const SignUp = () => {
             await setDoc(doc(db, 'users', user.uid), {
                 email: user.email,
                 username: username,
+                role: ["child", "adult"]
             });
 
             // after the user is created its displayName is updated

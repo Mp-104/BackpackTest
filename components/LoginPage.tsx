@@ -108,6 +108,16 @@ const LoginPage = () => {
 
                     const userCredential = await signInWithEmailAndPassword(auth, email, password);
                     const user = userCredential.user;
+
+                    const userDocRef = doc(db, "users", user.uid);
+                    const userDoc = await getDoc(userDocRef);
+
+
+                    console.log("user.displayName: ", user.displayName);
+                    console.log("userDoc.data().email: ", userDoc.data().email)
+                    console.log("userDoc.data().username: ", userDoc.data().username)
+                    console.log("userDoc.data().role: ", userDoc.data().role)
+
                     console.log("User logged in!: ", user.displayName || user.email)
                     Alert.alert('Inloggad', `Välkommen, ${username}!`);
                     console.log("inloggad: ", username);

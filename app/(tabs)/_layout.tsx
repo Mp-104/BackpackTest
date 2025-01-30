@@ -51,13 +51,18 @@ export default function TabLayout() {
           tabBarIcon: ({ color}) => <IconSymbol size={28} name="paperplane.fill" color={color} /> 
         }}
       />
-      {!user && (<Tabs.Screen
+      {!user && (
+        
+        <Tabs.Screen
         name='login'
         options={{
           title: "LogIn",
           tabBarIcon: ({ color}) => <IconSymbol size={28} name="paperplane.fill" color={color} /> 
         }}
-      />)}
+      />
+      
+      
+      )}
       
       <Tabs.Screen
         name='signup'

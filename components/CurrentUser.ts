@@ -1,9 +1,10 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
+import { getFirestore, collection, getDocs, getDoc, doc } from 'firebase/firestore/lite';
 import { getAnalytics } from 'firebase/analytics';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { useEffect, useState } from 'react';
-import { auth } from "./Firebase";
+import { auth, db } from "./Firebase";
+
 
 interface User {
     uid: string,
@@ -13,12 +14,23 @@ interface User {
 const currentUser = () => {
 
     const [user, setUser] = useState<any>(null);
+    const [userData, setUserData] = useState<any>(null);
 
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth , currentUser => {
+        const unsubscribe = onAuthStateChanged(auth , async (currentUser) => {
             if(currentUser) {
                 setUser(currentUser);
+
+                try {
+                    const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+                    
+                    if(userDoc.exists()) {
+                        setUserData(userDoc.data())
+                    }
+                } catch (error) {
+                    console.error("error fetching user data: ", error)
+                }
             } else {
                 setUser(null);
             }
@@ -27,8 +39,9 @@ const currentUser = () => {
         return () => unsubscribe();
     }, [])
 
-    return user;
+    return {user, userData} ;
 
 }
+
 
 export default currentUser;
