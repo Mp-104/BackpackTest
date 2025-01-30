@@ -1,4 +1,4 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import { Image, StyleSheet, Platform, Button, GestureResponderEvent } from 'react-native';
 
 import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
@@ -7,6 +7,8 @@ import { ThemedView } from '@/components/ThemedView';
 import { Test } from '@/components/Test';
 import Room1 from '@/components/Room1';
 import currentUser from '@/components/CurrentUser';
+import React from 'react';
+import { auth } from '@/components/Firebase';
 
 
 export default function HomeScreen() {
@@ -15,6 +17,11 @@ export default function HomeScreen() {
 
   const user = currentUser();
   
+  function handleLogout(event: GestureResponderEvent): void {
+    alert("this should log you out")
+    auth.signOut();
+  }
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
@@ -39,7 +46,10 @@ export default function HomeScreen() {
             style={styles.profileImage} // Same styling for the fallback image
           />
         )}
+
+        {user ? (<Button title='Log out' onPress={handleLogout}></Button> ) : <></>}
         
+
       </ThemedView>
       
       <ThemedView style={styles.stepContainer}>

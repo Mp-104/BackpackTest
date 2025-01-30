@@ -7,6 +7,8 @@ import { Button, Snackbar } from "react-native-paper";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "./Firebase";
 import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore/lite";
+import { routeToScreen } from "expo-router/build/useScreens";
+import { router } from "expo-router";
 
 
 const LoginPage = () => {
@@ -15,10 +17,14 @@ const LoginPage = () => {
     const [visible, setVisible] = useState<boolean>(false);
     const [visible2, setVisible2] = useState<boolean>(false);
 
+
+    // fetches the user email if they provide a username, used when attempting to log in
     const getEmailbyUsername = async (username: string) => {
 
         try {
 
+            // upon registration, users credentials (email + username) are stored in firestore as an object, in a collection "users".
+            // this fetches the data of that collection and searches each one for the matching username. If found, returns the email associated with the provided username.
             const usersCollectionRef = collection(db, "users");
             const queryingUsers = query(usersCollectionRef, where("username", "==", username));
 
@@ -53,6 +59,7 @@ const LoginPage = () => {
             /* console.log("det är tomt");
             alert("tomt") */
             setVisible2(true);
+            
 
         } else {
 
@@ -106,6 +113,16 @@ const LoginPage = () => {
                     console.log("inloggad: ", username);
                     /*  alert("test")*/
                     setVisible(true); 
+                    setUsername("");
+                    setPassword("");
+
+                    // the below redericts to the index.tsx , 
+                    router.replace("/(tabs)");
+
+                    // while this would redirect to explore.tsx  etc
+                    // router.replace("/(tabs)/explore") 
+
+                    //routeToScreen()
                 }
 
                 /* await signInWithEmailAndPassword(auth, username, password);

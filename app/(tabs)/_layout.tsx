@@ -8,9 +8,12 @@ import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { color } from '@/node_modules copy/ansi-fragments/build';
+import currentUser from '@/components/CurrentUser';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+
+  const user = currentUser()
 
   return (
     <Tabs
@@ -48,13 +51,14 @@ export default function TabLayout() {
           tabBarIcon: ({ color}) => <IconSymbol size={28} name="paperplane.fill" color={color} /> 
         }}
       />
-      <Tabs.Screen
+      {!user && (<Tabs.Screen
         name='login'
         options={{
           title: "LogIn",
           tabBarIcon: ({ color}) => <IconSymbol size={28} name="paperplane.fill" color={color} /> 
         }}
-      />
+      />)}
+      
       <Tabs.Screen
         name='signup'
         options={{
