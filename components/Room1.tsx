@@ -38,9 +38,11 @@ const RotatingAxle = () => {
     }
   }); */
 
+  // State to track the current target rotation either 0 or the currently set 45
   const [rotationTarget, setRotationTarget] = useState(45); // Initial target position (45 degrees)
-  const [rotationInProgress, setRotationInProgress] = useState(false); // Flag to track rotation progress
+  const [rotationInProgress, setRotationInProgress] = useState(false); // Flag to track rotation progress, to avoid triggering multiple clicks if rotation is ongoing
 
+  // Convert degrees to radians because Three.js works with radians
   const degToRad = (degrees: number): number => {
     return degrees * (Math.PI / 180);
   };
@@ -57,12 +59,15 @@ const RotatingAxle = () => {
   // Use useFrame to animate the rotation of the group
   useFrame(() => {
     if (rotationInProgress && groupRef.current) {
+      // convert the target rotation to radians for Three.js
       const targetRotation = degToRad(rotationTarget);
+      // get the current rotation of the group object (in radians)
       const currentRotation = groupRef.current.rotation.z;
 
       // Move smoothly towards the target
       const step = 0.05; // This is the speed of rotation (you can adjust it)
 
+      // check if the current rotation is sufficiently far from the target, if the difference is more than a step away, initiate movement. Math.abs uses absolute values eg -5 is the same as 5. 
       if (Math.abs(currentRotation - targetRotation) > step) {
         // Rotate towards the target angle (clockwise or counter-clockwise)
         if (currentRotation < targetRotation) {
