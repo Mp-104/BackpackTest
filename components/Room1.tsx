@@ -18,6 +18,71 @@ import { current } from "@/node_modules copy/@react-native-community/cli-tools/b
 
 
 interface RoomProps {}
+// isDragging as a prop, to enable it to interact with the parent Canvas where orbitControls are. The idea is to disable rotation of OrbitControls while dragging the object. 
+const DraggableObject = ({isDragging, setIsDragging}) => {
+  
+
+  const groupRef = useRef();
+  const meshRef = useRef();
+  
+  //const [isDragging, setIsDragging] = useState(false); // Track whether the object is being dragged
+  const [dragStartPosition, setDragStartPosition] = useState([0, 0]); // Store the initial drag position
+  const [objectPosition, setObjectPosition] = useState([0.5, 0, 0]); // Initial position of the object
+
+  // Handle the start of dragging
+  const handlePointerDown = (event) => {
+    setIsDragging(true);
+    // Capture the initial position where the drag started (in world coordinates)
+    setDragStartPosition([event.clientX, event.clientY]);
+  };
+
+  // Handle dragging motion, currently only X and Y axises are used, meaning the object can only be moved in 2d dimensions
+  const handlePointerMove = (event) => {
+    if (!isDragging) return; // Only move if we're currently dragging
+
+    const deltaX = event.clientX - dragStartPosition[0];
+    const deltaY = event.clientY - dragStartPosition[1];
+    
+    // Update the object's position based on mouse movement
+    setObjectPosition((prevPosition) => {
+      const newX = prevPosition[0] /*+*/- deltaX * 0.01; // Scaling the movement to make it slower
+      const newY = prevPosition[1] - deltaY * 0.01; // Negative because Y-axis is inverted in screen space -- works better with the X position too, at least in the current setup
+      return [newX, newY, prevPosition[2]]; // Keep the Z position unchanged
+    });
+
+    // Update the drag start position to be the current position to track movement
+    setDragStartPosition([event.clientX, event.clientY]);
+  };
+
+  // Handle the end of dragging
+  const handlePointerUp = () => {
+    setIsDragging(false); // Stop dragging
+  };
+
+  // Use useFrame to animate the object (if needed)
+  useFrame(() => {
+    if (groupRef.current) {
+      // Update the position of the group (or object) to the new position
+      groupRef.current.position.set(objectPosition[0], objectPosition[1], objectPosition[2]);
+    }
+  });
+
+  return (
+    <group
+      ref={groupRef}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerLeave={handlePointerUp} // Stop dragging if the pointer leaves the canvas
+    >
+      {/* The draggable object (e.g., a box) */}
+      <mesh ref={meshRef} position={objectPosition}>
+        <boxGeometry args={[1, 0.2, 0.2]} />
+        <meshBasicMaterial color="blue" />
+      </mesh>
+    </group>
+  );
+};
 
 const RotatingAxle = () => {
 
@@ -265,6 +330,9 @@ const Table: React.FC<{ position: [number, number, number], scale: [number, numb
 }
 
 const Room: React.FC<RoomProps> = () => {
+
+  const [isDragging, setIsDragging] = useState(false);
+
   // Load the image using Expo's Asset module
   const reactLogo = Asset.fromModule(require('../assets/images/partial-react-logo.png')).uri;
 
@@ -351,6 +419,8 @@ const Room: React.FC<RoomProps> = () => {
 
         <RotatingAxle></RotatingAxle>
 
+        <DraggableObject isDragging={isDragging} setIsDragging={setIsDragging}></DraggableObject>
+
         {/* Create the floor */}
         <Plane args={[5, 5]} position={[0, -2.5, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <meshStandardMaterial color="lightgray" />
@@ -410,7 +480,7 @@ const Room: React.FC<RoomProps> = () => {
         <primitive position={[-2.4, -2.5, 0.5]} object={model3.scene} scale={[2, 2, 2]} rotation={[0, 1.57, 0]}/>
 
         {/* Camera controls for navigating the scene */}
-        <OrbitControls enablePan={false} minDistance={1} maxDistance={5} />
+        <OrbitControls enablePan={false} minDistance={1} maxDistance={5} enableRotate={!isDragging} />
 
         <PerspectiveCamera makeDefault position={[0, 1000000, -3000000]} />
 
