@@ -5,7 +5,7 @@ import { View } from "react-native";
 import { Image, StyleSheet, Platform } from 'react-native';
 
 import { useLoader } from "@react-three/fiber";
-import { MeshStandardMaterial, TextureLoader } from "three"; 
+import { MathUtils, MeshStandardMaterial, TextureLoader } from "three"; 
 
 import { Asset } from 'expo-asset';
 //import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
@@ -13,9 +13,135 @@ import { Asset } from 'expo-asset';
 import { useGLTF } from '@react-three/drei/native'
 import { GLTFLoader } from "@/node_modules copy/three-stdlib";
 import { PerspectiveCamera } from "@/node_modules copy/@react-three/drei";
+import { group } from "@/node_modules copy/@types/yargs";
+import { current } from "@/node_modules copy/@react-native-community/cli-tools/build/releaseChecker";
 
 
 interface RoomProps {}
+
+const RotatingAxle = () => {
+
+
+  const skel = Asset.fromModule(require('../assets/model.glb')).uri;
+
+
+  const model = useLoader(GLTFLoader, skel);
+
+
+  const groupRef = useRef();
+  const skelRef = useRef();
+
+
+  /* useFrame(() => {
+    if (groupRef.current) {
+      groupRef.current.rotation.z += 0.1; // Rotate the axle (like a clock hand)
+    }
+  }); */
+
+  const [rotationTarget, setRotationTarget] = useState(45); // Initial target position (45 degrees)
+  const [rotationInProgress, setRotationInProgress] = useState(false); // Flag to track rotation progress
+
+  const degToRad = (degrees: number): number => {
+    return degrees * (Math.PI / 180);
+  };
+
+  const handleClick = () => {
+    if (rotationInProgress) return; // Prevent triggering rotation if it's still in progress
+
+    // Start rotation and toggle target angle
+    setRotationInProgress(true);
+    const newTarget = rotationTarget === 45 ? 0 : 45;
+    setRotationTarget(newTarget); // Update the new target angle
+  };
+
+  // Use useFrame to animate the rotation of the group
+  useFrame(() => {
+    if (rotationInProgress && groupRef.current) {
+      const targetRotation = degToRad(rotationTarget);
+      const currentRotation = groupRef.current.rotation.z;
+
+      // Move smoothly towards the target
+      const step = 0.05; // This is the speed of rotation (you can adjust it)
+
+      if (Math.abs(currentRotation - targetRotation) > step) {
+        // Rotate towards the target angle (clockwise or counter-clockwise)
+        if (currentRotation < targetRotation) {
+          groupRef.current.rotation.z += step;
+        } else {
+          groupRef.current.rotation.z -= step;
+        }
+      } else {
+        // When the rotation is very close to the target, stop and correct the overshoot
+        groupRef.current.rotation.z = targetRotation;
+        setRotationInProgress(false); // Stop the rotation once the target is reached
+      }
+    }
+  });
+
+  /* const [isRotating, setIsRotating] = useState(false);
+  const [rotationTarget, setRotationTarget] = useState(0);
+
+  const handleClick = () => {
+    setIsRotating(true);
+    setRotationTarget(45);
+  }
+
+
+
+
+  const degToRad = (degrees: number): number => {
+    return degrees * (Math.PI / 180);
+  };
+
+  let time = 0;
+  const speed = 5;
+  const angleRange = 45;
+  const angleOffset = 2.1;
+
+  useFrame(() => {
+    if (isRotating && groupRef.current) {
+      const elapsedTime = groupRef.current.rotation.z / degToRad(rotationTarget);
+      if (elapsedTime < 1) {
+        groupRef.current.rotation.z += degToRad(rotationTarget) * 0.05
+      } else {
+        setIsRotating(false);
+      }
+    }
+  }) */
+
+  let time = 0;
+  const speed = 5;
+  const angleRange = 45;
+  const angleOffset = 2.1;
+
+  // Use useFrame to animate the rotation of the group
+  /* useFrame((state) => {
+    const { clock } = state; // Get the clock from the state
+
+    const time = clock.elapsedTime; // Time in seconds
+
+    if (groupRef.current) {
+      // Control the speed of oscillation by scaling time and limiting the angle range
+      const oscillation = Math.sin(time * speed) * angleRange; // Adjust '0.5' for speed control (higher = faster)
+      groupRef.current.rotation.z = degToRad(oscillation) + angleOffset; // Convert degrees to radians
+    }
+  }); */
+
+
+  return (
+    <group ref={groupRef} onClick={handleClick}>
+    {/* The object representing the clock hand */}
+    <mesh  position={[0.5, 0, 0]}>
+      <boxGeometry args={[1, 0.2, 0.2]} />
+      <meshBasicMaterial color="red" />
+    </mesh>
+   
+  </group>
+  )
+
+
+}
+
 
 const Ball = () => {
 
@@ -217,6 +343,8 @@ const Room: React.FC<RoomProps> = () => {
       <Canvas style={{ flex: 1 }} camera={{ position: [0, 1, 4], fov: 50 }}>
         {/* Add an environment map for realistic lighting */}
         <Environment preset="sunset" />
+
+        <RotatingAxle></RotatingAxle>
 
         {/* Create the floor */}
         <Plane args={[5, 5]} position={[0, -2.5, 0]} rotation={[-Math.PI / 2, 0, 0]}>

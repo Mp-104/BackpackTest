@@ -143,6 +143,7 @@ const LoginPage = () => {
 
                     console.log("User logged in!: ", user.displayName || user.email)
                     Alert.alert('Inloggad', `Välkommen, ${username}!`);
+                    Alert.alert('Inloggad', `Welcommen, ${username}!`);
                     console.log("inloggad: ", username);
                     /*  alert("test")*/
                     setVisible(true); 
@@ -198,6 +199,7 @@ const LoginPage = () => {
                 Logga in
             </Button>
 
+            
             <Snackbar style={styles.snackbar}
                 visible={visible}
                 onDismiss={() => setVisible(false)}
