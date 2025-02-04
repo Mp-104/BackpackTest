@@ -1,11 +1,11 @@
 import { Box, Environment, OrbitControls, Plane, Sphere, Texture } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import { View } from "react-native";
 import { Image, StyleSheet, Platform } from 'react-native';
 
 import { useLoader } from "@react-three/fiber";
-import { MathUtils, MeshStandardMaterial, TextureLoader } from "three"; 
+import { MathUtils, MeshStandardMaterial, TextureLoader, Vector3, Ray } from "three"; 
 
 import { Asset } from 'expo-asset';
 //import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
@@ -27,7 +27,10 @@ const DraggableObject = ({isDragging, setIsDragging}) => {
   
   //const [isDragging, setIsDragging] = useState(false); // Track whether the object is being dragged
   const [dragStartPosition, setDragStartPosition] = useState([0, 0]); // Store the initial drag position
-  const [objectPosition, setObjectPosition] = useState([0.5, 0, 0]); // Initial position of the object
+  const [objectPosition, setObjectPosition] = useState([0.75, 0, 0]); // Initial position of the object
+
+  // makes movement more adjustable
+  const movementScale = useMemo( () => 0.0025, []);
 
   // Handle the start of dragging
   const handlePointerDown = (event) => {
@@ -45,8 +48,8 @@ const DraggableObject = ({isDragging, setIsDragging}) => {
     
     // Update the object's position based on mouse movement
     setObjectPosition((prevPosition) => {
-      const newX = prevPosition[0] /*+*/- deltaX * 0.01; // Scaling the movement to make it slower
-      const newY = prevPosition[1] - deltaY * 0.01; // Negative because Y-axis is inverted in screen space -- works better with the X position too, at least in the current setup
+      const newX = prevPosition[0] /*+*/- deltaX * movementScale/* 0.0025 */; // Scaling the movement to make it slower
+      const newY = prevPosition[1] - deltaY * movementScale/* 0.002 */; // Negative because Y-axis is inverted in screen space -- works better with the X position too, at least in the current setup
       return [newX, newY, prevPosition[2]]; // Keep the Z position unchanged
     });
 
@@ -78,7 +81,7 @@ const DraggableObject = ({isDragging, setIsDragging}) => {
       {/* The draggable object (e.g., a box) */}
       <mesh ref={meshRef} position={objectPosition}>
         <boxGeometry args={[1, 0.2, 0.2]} />
-        <meshBasicMaterial color="blue" />
+        <meshBasicMaterial color={isDragging ? "darkblue" : "blue"} />
       </mesh>
     </group>
   );
