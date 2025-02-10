@@ -19,8 +19,8 @@ import { current } from "@/node_modules copy/@react-native-community/cli-tools/b
 
 interface RoomProps {}
 
-const Earth = ({position} : {position : [number, number, number]}) => {
-  const earth = Asset.fromModule(require('../assets/earth.glb')).uri;
+const BlenderModel = ({position} : {position : [number, number, number]}) => {
+  const earth = Asset.fromModule(require('../assets/test2.glb')).uri;
 
   const {scene, animations } = useLoader(GLTFLoader, earth);
 
@@ -32,6 +32,7 @@ const Earth = ({position} : {position : [number, number, number]}) => {
     if (animations.length) {
       console.log("animations length", animations.length)
       mixer.current = new AnimationMixer(scene);
+      
       animations.forEach((clip) => {
         mixer.current.clipAction(clip).play();
       })
@@ -45,7 +46,38 @@ const Earth = ({position} : {position : [number, number, number]}) => {
   });
 
   return(
-    <primitive object={scene} position={position}/>
+    <primitive object={scene} position={position} scale={[0.1, 0.1, 0.1]} rotation={[0, Math.PI + 6.2, 0]}/>
+  )
+}
+
+const Earth = ({position} : {position : [number, number, number]}) => {
+  const earth = Asset.fromModule(require('../assets/earth.glb')).uri;
+
+  const {scene, animations } = useLoader(GLTFLoader, earth);
+
+  const mixer = useRef();
+
+  useEffect(() => {
+    console.log("animations length", animations.length)
+
+    if (animations.length) {
+      console.log("animations length", animations.length)
+      mixer.current = new AnimationMixer(scene);
+      
+      animations.forEach((clip) => {
+        mixer.current.clipAction(clip).play();
+      })
+    }
+  }, [animations, scene]);
+
+  useFrame((state, delta) => {
+    if(mixer.current) {
+      mixer.current.update(delta);
+    }
+  });
+
+  return(
+    <primitive object={scene} position={position} />
   )
 }
 
@@ -528,6 +560,8 @@ const Room: React.FC<RoomProps> = () => {
         <Ball />
 
         <Earth position={[-1.2, 0.5, -1]}/>
+
+        <BlenderModel position={[1, 1, 0]}/>
 
         {/* <primitive object={scene}/> */}
 
