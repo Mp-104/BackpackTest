@@ -24,6 +24,7 @@ const BlenderModel = ({position} : {position : [number, number, number]}) => {
 
   const {scene, animations } = useLoader(GLTFLoader, earth);
 
+  // Creates a ref to store the mixer and bind it to the animation
   const mixer = useRef();
 
   useEffect(() => {
@@ -31,14 +32,17 @@ const BlenderModel = ({position} : {position : [number, number, number]}) => {
 
     if (animations.length) {
       console.log("animations length", animations.length)
+      // if animations present, initialise a new AnimationMixer using the scene of the object as a prop, that which will be animated
       mixer.current = new AnimationMixer(scene);
       
+      // goes through every animations and plays them
       animations.forEach((clip) => {
         mixer.current.clipAction(clip).play();
       })
     }
   }, [animations, scene]);
 
+  // updates the mixer in the animation loop
   useFrame((state, delta) => {
     if(mixer.current) {
       mixer.current.update(delta);
