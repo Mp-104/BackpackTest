@@ -6,5 +6,6 @@ const config = getDefaultConfig(__dirname);
 config.resolver.assetExts.push("glb");
 config.resolver.assetExts.push("obj");
 config.resolver.assetExts.push("gltf");
+config.resolver.assetExts.push("fbx");
 
 module.exports = config;

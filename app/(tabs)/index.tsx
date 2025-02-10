@@ -20,7 +20,6 @@ export default function HomeScreen() {
 
   const user = currentUser().user;
   const userData = currentUser().userData;
-  
   useEffect(() => {
     console.log("user data updated: ", userData);
   }, [userData])

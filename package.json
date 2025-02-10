@@ -37,6 +37,7 @@
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-native": "0.76.6",
+    "react-native-app-usage": "^0.1.6",
     "react-native-gesture-handler": "~2.20.2",
     "react-native-paper": "^5.13.1",
     "react-native-reanimated": "~3.16.1",
@@ -49,6 +50,7 @@
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@babel/preset-react": "^7.26.3",
+    "@react-native-community/cli": "^15.1.3",
     "@types/jest": "^29.5.12",
     "@types/react": "~18.3.12",
     "@types/react-native": "^0.72.8",

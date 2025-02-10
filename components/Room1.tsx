@@ -5,7 +5,7 @@ import { View } from "react-native";
 import { Image, StyleSheet, Platform } from 'react-native';
 
 import { useLoader } from "@react-three/fiber";
-import { MathUtils, MeshStandardMaterial, TextureLoader, Vector3, Ray } from "three"; 
+import { MathUtils, MeshStandardMaterial, TextureLoader, Vector3, Ray, AnimationMixer } from "three"; 
 
 import { Asset } from 'expo-asset';
 //import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
@@ -18,6 +18,37 @@ import { current } from "@/node_modules copy/@react-native-community/cli-tools/b
 
 
 interface RoomProps {}
+
+const Earth = ({position} : {position : [number, number, number]}) => {
+  const earth = Asset.fromModule(require('../assets/earth.glb')).uri;
+
+  const {scene, animations } = useLoader(GLTFLoader, earth);
+
+  const mixer = useRef();
+
+  useEffect(() => {
+    console.log("animations length", animations.length)
+
+    if (animations.length) {
+      console.log("animations length", animations.length)
+      mixer.current = new AnimationMixer(scene);
+      animations.forEach((clip) => {
+        mixer.current.clipAction(clip).play();
+      })
+    }
+  }, [animations, scene]);
+
+  useFrame((state, delta) => {
+    if(mixer.current) {
+      mixer.current.update(delta);
+    }
+  });
+
+  return(
+    <primitive object={scene} position={position}/>
+  )
+}
+
 // isDragging as a prop, to enable it to interact with the parent Canvas where orbitControls are. The idea is to disable rotation of OrbitControls while dragging the object. 
 const DraggableObject = ({isDragging, setIsDragging}) => {
   
@@ -367,6 +398,28 @@ const Room: React.FC<RoomProps> = () => {
   const pistol = Asset.fromModule(require('../assets/Pistol.glb')).uri;
 
   const toilet = Asset.fromModule(require('../assets/toilet.gltf')).uri;
+
+  const emmo = Asset.fromModule(require('../assets/untitled.glb')).uri;
+
+  
+  /* const mixer = new AnimationMixer(scene);
+  animations.forEach((clip) => {
+    mixer.clipAction(clip).play();
+  }); */
+  
+
+
+
+  //const {scene, animations } = useGLTF('../assets/untitled.glb');
+  
+  /* const {scene, animations} = useLoader(GLTFLoader, emmo);
+
+  const mixer = new AnimationMixer(scene);
+  animations.forEach((clip) => {
+    mixer.clipAction(clip).play();
+  }); */
+
+  
   
 
   const model = useLoader(GLTFLoader, skel);
@@ -374,6 +427,8 @@ const Room: React.FC<RoomProps> = () => {
   const model2 = useLoader(GLTFLoader, pistol);
 
   const model3 = useLoader(GLTFLoader, toilet);
+
+  const model4 = useLoader(GLTFLoader, emmo);
 
     //const model = useGLTF('../assets/model.glb');
 
@@ -472,9 +527,16 @@ const Room: React.FC<RoomProps> = () => {
 
         <Ball />
 
+        <Earth position={[-1.2, 0.5, -1]}/>
+
+        {/* <primitive object={scene}/> */}
+
 
         {/* Skeleton*/}
         <primitive position={[2.2, -2.5, 1.7]} object={model.scene} scale={[0.1, 0.1, 0.1]} rotation={[0, Math.PI / -2, 0]}/>
+
+        {/* Emmo */}
+        <primitive  position={[-1.4, -0.9, 1.7]}  object={model4.scene} scale={[0.3, 0.3, 0.3]} map={texture}  rotation={[0, Math.PI +4.7 , 0]} />
 
         {/* Pistol*/}
         <primitive position={[-1.4, -1.325, 1.5]} object={model2.scene} scale={[1, 1, 1]} rotation={[1.5, 0, 0]} onPointerDown={handleClick}/>
