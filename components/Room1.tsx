@@ -25,7 +25,7 @@ const BlenderModel = ({position} : {position : [number, number, number]}) => {
   const {scene, animations } = useLoader(GLTFLoader, earth);
 
   // Creates a ref to store the mixer and bind it to the animation
-  const mixer = useRef();
+  const mixer = useRef<AnimationMixer | null>(null);
 
   useEffect(() => {
     console.log("animations length", animations.length)
@@ -43,7 +43,7 @@ const BlenderModel = ({position} : {position : [number, number, number]}) => {
   }, [animations, scene]);
 
   // updates the mixer in the animation loop
-  useFrame((state, delta) => {
+  useFrame((state, delta: number) => {
     if(mixer.current) {
       mixer.current.update(delta);
     }

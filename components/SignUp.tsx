@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Alert, StyleSheet, View, Text } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { Button, Snackbar } from "react-native-paper";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendEmailVerification, signOut, updateProfile } from "firebase/auth";
 import { auth, db } from "./Firebase";
 import { doc, setDoc } from "firebase/firestore/lite";
 
@@ -27,6 +27,15 @@ const SignUp = () => {
             // this creates a new user with email and password using the auth configuration 
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
+
+            sendEmailVerification(user);
+            
+            auth.signOut()
+            
+            
+            user.emailVerified
+
+            
 
             //notifying that the registration was successful
             Alert.alert('Registrering lyckades', `Välkommen, ${email}!`);

@@ -126,6 +126,8 @@ const LoginPage = () => {
                     auth.signOut();
 
                     const userCredential1 = await signInWithEmailAndPassword(auth, email, password);
+
+                    
                     
 
                     const updatedUserDoc = await getDoc(userDocRef);
@@ -151,8 +153,15 @@ const LoginPage = () => {
                     setPassword("");
 
                     // the below redericts to the index.tsx , 
-                    router.replace("/(tabs)");
+                    
+                    if (!auth.currentUser?.emailVerified) {
+                        auth.signOut();
+                        console.log("the email is not verified, cannot log in");
+                        auth.signOut();
 
+                    } else {
+                        router.replace("/(tabs)");
+                    }
                     // while this would redirect to explore.tsx  etc
                     // router.replace("/(tabs)/explore") 
 

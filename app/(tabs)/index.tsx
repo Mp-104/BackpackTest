@@ -15,11 +15,16 @@ export default function HomeScreen() {
 
 
 
-  
+  const user1 = auth.currentUser?.emailVerified;
+  console.log("user verified? ", user1);
   
 
   const user = currentUser().user;
-  const userData = currentUser().userData;
+  let userData = currentUser().userData;
+
+  if (!user) {
+    userData = null;
+  }
   useEffect(() => {
     console.log("user data updated: ", userData);
   }, [userData])
